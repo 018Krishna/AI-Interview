@@ -2,6 +2,18 @@
 
 Interactive, browser-first interview simulator built with **React + TypeScript + Vite**. Candidates practice a timed, full-stack interview while interviewers monitor real-time analytics, review transcripts, and manage leaderboard rankings. All data persists in the browser so sessions survive refreshes, accidental closes, and device sleep.
 
+<img width="1905" height="891" alt="image" src="https://github.com/user-attachments/assets/7dd22007-0b9d-4be7-a34f-357ce4293510" />
+
+<img width="1874" height="868" alt="image" src="https://github.com/user-attachments/assets/236641a5-3d8b-4a5f-b6e7-80931d15c4dd" />
+
+<img width="1845" height="887" alt="image" src="https://github.com/user-attachments/assets/5c36e98c-c5e7-4a65-8bb2-179877835dd6" />
+
+<img width="1879" height="865" alt="image" src="https://github.com/user-attachments/assets/df21f9f5-084e-4206-8f5c-8ef13244aa3f" />
+
+<img width="1875" height="878" alt="image" src="https://github.com/user-attachments/assets/b4ad87d0-86cc-450f-a1ba-e6adfa610054" />
+
+
+
 ## ✨ Features
 
 - **Resume intake** – drag-and-drop PDF/DOCX, client-side parsing (PDF.js + Mammoth) with smart extraction of name, email, and phone.

@@ -1,0 +1,148 @@
+# AI-Powered Interview Assistant
+
+Interactive, browser-first interview simulator built with **React + TypeScript + Vite**. Candidates practice a timed, full-stack interview while interviewers monitor real-time analytics, review transcripts, and manage leaderboard rankings. All data persists in the browser so sessions survive refreshes, accidental closes, and device sleep.
+
+## ✨ Features
+
+- **Resume intake** – drag-and-drop PDF/DOCX, client-side parsing (PDF.js + Mammoth) with smart extraction of name, email, and phone.
+- **Profile completion flow** – conversational prompts request any missing contact fields before the interview starts.
+- **AI-driven questions** – integrates with **OpenAI (GPT-4.1 mini by default)** to generate six progressive questions (2 easy → 2 medium → 2 hard) for React/Node roles. Automatic local fallback question bank if the API is unavailable.
+- **Timed chat interview** – single-question focus, difficulty-based timers, auto-submit on timeout, and friendly assistant feedback after every answer.
+- **Scoring & summary** – heuristic scoring engine evaluates coverage, depth, and keyword alignment, then produces a concise AI summary.
+- **Interviewer dashboard** – sortable/searchable candidate table, detailed drawer with profile, chat history, and full transcript (questions, answers, scores, feedback).
+- **Persistence + welcome-back modal** – full Redux state stored via `redux-persist`. Returning users are greeted with a resume modal to continue or restart.
+
+## 🧱 Architecture overview
+
+| Layer | Responsibilities |
+| --- | --- |
+| `src/app` | Redux store, typed hooks, persistence bootstrap. |
+| `src/features/candidates` | Slices, selectors, and thunks orchestrating resume ingestion, question flow, timers, scoring, and summaries. |
+| `src/features/interviewee` | Interview chat experience + resume upload UI. |
+| `src/features/interviewer` | Dashboard, filtering, drawer detail views. |
+| `src/components` | Shared UI (chat log, timers, modals, upload card). |
+| `src/services/openai.ts` | OpenAI client with automatic fallback to the local bank. |
+| `src/utils` | Resume parsing, question bank, scoring heuristics. |
+
+State is normalized in Redux (`candidatesSlice`, `uiSlice`) and persisted to `localStorage`. Timers are stored as serializable metadata so interviews can pause/resume without drift.
+
+## 🚀 Getting started
+
+> **Prerequisites**
+>
+> - Node.js **20.19.0+** (Vite 7 requirement – upgrade if you see an engine warning)
+> - npm 10+
+
+1. Install dependencies:
+
+   ```powershell
+   npm install
+   ```
+
+2. Create an `.env.local` file in the project root and add your OpenAI API key:
+
+   ```env
+   VITE_OPENAI_API_KEY=sk-...
+   # Optional: override the default model (defaults to gpt-4.1-mini)
+   VITE_OPENAI_MODEL=gpt-4.1-mini
+   ```
+
+   Make sure the key has access to the **Responses API**. Browser builds expose this key, so rotate it regularly and add domain restrictions when deploying.
+
+3. Start the dev server:
+
+   ```powershell
+   npm run dev
+   ```
+
+   Visit http://localhost:5173.
+
+4. Build for production:
+
+   ```powershell
+   npm run build
+   ```
+
+5. Optional lint check:
+
+   ```powershell
+   npm run lint
+   ```
+
+## 🧭 Interview flow
+
+1. **Upload resume** → automatic parsing & extraction.
+2. **Fill missing details** → assistant asks for name/email/phone if absent or invalid.
+3. **Start interview** → six AI-generated questions delivered in order of increasing difficulty. Timers auto-submit responses.
+4. **Per-question feedback** → assistant shares reasoning, keyword coverage, and pacing advice.
+5. **Completion summary** → final score (0–100), strengths, areas to improve, and executive remark.
+6. **Dashboard sync** → interviewer tab updates instantly with new candidate, transcript, and analytics.
+
+## 🔐 OpenAI usage & fallbacks
+
+- API access flows through the official `openai` SDK using the **Responses API** (defaults to the `gpt-4.1-mini` model, configurable via `VITE_OPENAI_MODEL`).
+- Responses are coerced to JSON via `response_format` so client parsing remains stable.
+- If the API key is missing, invalid, or times out, the app gracefully falls back to a curated local question bank.
+
+## 🧪 Testing & validation
+
+- `npm run build` — TypeScript project references + Vite production bundle (used for verification in this submission).
+- `npm run lint` — ESLint with the default Vite/React rules (optional but recommended before shipping).
+
+## 🌐 Deployment checklist
+
+1. Build the app (`npm run build`).
+2. Deploy the `dist/` folder to Netlify, Vercel, or any static host.
+3. Set the `VITE_OPENAI_API_KEY` (and optionally `VITE_OPENAI_MODEL`) environment variable in your hosting provider.
+4. Record a 2–5 minute walkthrough video covering both tabs and the resume persistence flow.
+5. Share the GitHub repo + live demo + video link via the Swipe submission form.
+
+## ☁️ Deploying on Render
+
+Render can host the bundled Vite output as a **Static Site** while running the build for you. After pushing your latest changes to GitHub:
+
+1. Sign in to [render.com](https://render.com) and click **New ➜ Static Site**.
+2. Connect the GitHub repository that contains this project and select the default branch you want Render to deploy from.
+3. Configure the build settings:
+   - **Build Command:** `npm install && npm run build`
+   - **Publish Directory:** `dist`
+   - **Node Version:** set an environment variable `NODE_VERSION=20.19.0` (Render reads this and installs the matching runtime required by Vite 7).
+4. In the **Environment Variables** section, add your OpenAI key:
+   - `VITE_OPENAI_API_KEY=sk-...`
+   - (Optional) `VITE_OPENAI_MODEL=gpt-4.1-mini`
+5. Click **Create Static Site** and wait for the initial deploy to finish. Render will automatically run the build, upload the `dist/` directory, and serve it over HTTPS.
+6. (Optional) Enable **Auto-Deploy** so every push to the selected branch triggers a new build. You can also add protected preview environments by creating additional Static Sites from feature branches.
+
+Once deployed, visit the Render-provided URL to verify the interviewee and interviewer flows, and capture your submission demo from the hosted instance.
+
+## 📂 Project tree (excerpt)
+
+```
+src/
+├── app/
+│   ├── hooks.ts
+│   └── store.ts
+├── components/
+│   ├── ChatMessages.tsx
+│   ├── QuestionTimer.tsx
+│   ├── ResumeUploadCard.tsx
+│   └── WelcomeBackModal.tsx
+├── features/
+│   ├── candidates/
+│   │   ├── candidatesSlice.ts
+│   │   ├── selectors.ts
+│   │   └── thunks.ts
+│   ├── interviewee/IntervieweeView.tsx
+│   └── interviewer/InterviewerView.tsx
+├── services/openai.ts
+├── utils/
+│   ├── questionBank.ts
+│   ├── resumeParser.ts
+│   └── scoring.ts
+└── types/index.ts
+```
+
+## 🙌 Credits
+Sumit Ranjan 
+
+

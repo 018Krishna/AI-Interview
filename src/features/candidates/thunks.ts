@@ -18,7 +18,7 @@ import {
   selectOutstandingProfileFields,
 } from './selectors'
 import { parseResumeFile } from '@/utils/resumeParser'
-import { generateQuestionsOrFallback } from '@/services/openai'
+import { generateQuestionsOrFallback } from '@/services/gemini'
 import { QUESTION_TIMINGS } from '@/utils/questionBank'
 import { buildSummary, evaluateAnswer } from '@/utils/scoring'
 import { setWelcomeBackCandidate } from '@/features/ui/uiSlice'

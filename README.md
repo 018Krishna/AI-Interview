@@ -18,7 +18,7 @@ Interactive, browser-first interview simulator built with **React + TypeScript +
 
 - **Resume intake** – drag-and-drop PDF/DOCX, client-side parsing (PDF.js + Mammoth) with smart extraction of name, email, and phone.
 - **Profile completion flow** – conversational prompts request any missing contact fields before the interview starts.
-- **AI-driven questions** – integrates with **OpenAI (GPT-4.1 mini by default)** to generate six progressive questions (2 easy → 2 medium → 2 hard) for React/Node roles. Automatic local fallback question bank if the API is unavailable.
+- **AI-driven questions** – integrates with **Google Gemini 1.5 Pro** to generate six progressive questions (2 easy → 2 medium → 2 hard) for React/Node roles. Automatic local fallback question bank if the API is unavailable.
 - **Timed chat interview** – single-question focus, difficulty-based timers, auto-submit on timeout, and friendly assistant feedback after every answer.
 - **Scoring & summary** – heuristic scoring engine evaluates coverage, depth, and keyword alignment, then produces a concise AI summary.
 - **Interviewer dashboard** – sortable/searchable candidate table, detailed drawer with profile, chat history, and full transcript (questions, answers, scores, feedback).
@@ -33,7 +33,7 @@ Interactive, browser-first interview simulator built with **React + TypeScript +
 | `src/features/interviewee` | Interview chat experience + resume upload UI. |
 | `src/features/interviewer` | Dashboard, filtering, drawer detail views. |
 | `src/components` | Shared UI (chat log, timers, modals, upload card). |
-| `src/services/openai.ts` | OpenAI client with automatic fallback to the local bank. |
+| `src/services/gemini.ts` | Google Generative AI client with automatic fallback. |
 | `src/utils` | Resume parsing, question bank, scoring heuristics. |
 
 State is normalized in Redux (`candidatesSlice`, `uiSlice`) and persisted to `localStorage`. Timers are stored as serializable metadata so interviews can pause/resume without drift.
@@ -51,15 +51,13 @@ State is normalized in Redux (`candidatesSlice`, `uiSlice`) and persisted to `lo
    npm install
    ```
 
-2. Create an `.env.local` file in the project root and add your OpenAI API key:
+2. Create an `.env.local` file in the project root and add your Gemini API key:
 
    ```env
-   VITE_OPENAI_API_KEY=sk-...
-   # Optional: override the default model (defaults to gpt-4.1-mini)
-   VITE_OPENAI_MODEL=gpt-4.1-mini
+   VITE_GEMINI_API_KEY=your_google_generative_ai_key
    ```
 
-   Make sure the key has access to the **Responses API**. Browser builds expose this key, so rotate it regularly and add domain restrictions when deploying.
+   The key must have access to the Google Generative Language API. Since this runs fully client-side, rotate the key periodically or use domain restrictions when deploying.
 
 3. Start the dev server:
 
@@ -90,10 +88,10 @@ State is normalized in Redux (`candidatesSlice`, `uiSlice`) and persisted to `lo
 5. **Completion summary** → final score (0–100), strengths, areas to improve, and executive remark.
 6. **Dashboard sync** → interviewer tab updates instantly with new candidate, transcript, and analytics.
 
-## 🔐 OpenAI usage & fallbacks
+## 🔐 Gemini usage & fallbacks
 
-- API access flows through the official `openai` SDK using the **Responses API** (defaults to the `gpt-4.1-mini` model, configurable via `VITE_OPENAI_MODEL`).
-- Responses are coerced to JSON via `response_format` so client parsing remains stable.
+- API access flows through `@google/generative-ai` using the `gemini-pro` model.
+- Responses are requested in JSON and normalized before hitting the store.
 - If the API key is missing, invalid, or times out, the app gracefully falls back to a curated local question bank.
 
 ## 🧪 Testing & validation
@@ -105,7 +103,7 @@ State is normalized in Redux (`candidatesSlice`, `uiSlice`) and persisted to `lo
 
 1. Build the app (`npm run build`).
 2. Deploy the `dist/` folder to Netlify, Vercel, or any static host.
-3. Set the `VITE_OPENAI_API_KEY` (and optionally `VITE_OPENAI_MODEL`) environment variable in your hosting provider.
+3. Set the `VITE_GEMINI_API_KEY` environment variable in your hosting provider.
 4. Record a 2–5 minute walkthrough video covering both tabs and the resume persistence flow.
 5. Share the GitHub repo + live demo + video link via the Swipe submission form.
 
@@ -119,9 +117,8 @@ Render can host the bundled Vite output as a **Static Site** while running the b
    - **Build Command:** `npm install && npm run build`
    - **Publish Directory:** `dist`
    - **Node Version:** set an environment variable `NODE_VERSION=20.19.0` (Render reads this and installs the matching runtime required by Vite 7).
-4. In the **Environment Variables** section, add your OpenAI key:
-   - `VITE_OPENAI_API_KEY=sk-...`
-   - (Optional) `VITE_OPENAI_MODEL=gpt-4.1-mini`
+4. In the **Environment Variables** section, add your Gemini key:
+   - `VITE_GEMINI_API_KEY=your_google_generative_ai_key`
 5. Click **Create Static Site** and wait for the initial deploy to finish. Render will automatically run the build, upload the `dist/` directory, and serve it over HTTPS.
 6. (Optional) Enable **Auto-Deploy** so every push to the selected branch triggers a new build. You can also add protected preview environments by creating additional Static Sites from feature branches.
 
@@ -146,7 +143,7 @@ src/
 │   │   └── thunks.ts
 │   ├── interviewee/IntervieweeView.tsx
 │   └── interviewer/InterviewerView.tsx
-├── services/openai.ts
+├── services/gemini.ts
 ├── utils/
 │   ├── questionBank.ts
 │   ├── resumeParser.ts

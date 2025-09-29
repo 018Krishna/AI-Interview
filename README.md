@@ -151,7 +151,6 @@ src/
 └── types/index.ts
 ```
 
-## 🙌 Credits
-Sumit Ranjan 
+
 
 
